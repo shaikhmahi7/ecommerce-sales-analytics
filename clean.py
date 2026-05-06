@@ -19,9 +19,8 @@ payments  = pd.read_sql("SELECT order_id, payment_type FROM payments", conn)
 conn.close()
 print("✓ All tables loaded")
 
-# ================================================
 # STEP 1 - Fix date columns
-# ================================================
+
 date_cols = [
     'order_purchase_timestamp',
     'order_approved_at',
@@ -33,9 +32,9 @@ for col in date_cols:
     orders[col] = pd.to_datetime(orders[col])
 print("✓ Dates fixed")
 
-# ================================================
+
 # STEP 2 - Add useful columns
-# ================================================
+
 # How many days did delivery take?
 orders['delivery_days'] = (
     orders['order_delivered_customer_date'] -
@@ -54,9 +53,9 @@ orders['order_year']  = orders['order_purchase_timestamp'].dt.year
 orders['order_dow']   = orders['order_purchase_timestamp'].dt.day_name()
 print("✓ New columns added")
 
-# ================================================
+
 # STEP 3 - Merge all tables together
-# ================================================
+
 df = orders.merge(items,      on='order_id',    how='left')
 df = df.merge(customers,      on='customer_id', how='left')
 df = df.merge(reviews[['order_id','review_score']], on='order_id', how='left')
@@ -68,15 +67,14 @@ df = df.merge(payments,       on='order_id',    how='left')
 df = df[df['order_status'] == 'delivered'].copy()
 print(f"✓ All tables merged: {df.shape[0]} rows, {df.shape[1]} columns")
 
-# ================================================
+
 # STEP 4 - Save clean data
-# ================================================
+
 df.to_csv('Output/clean_data.csv', index=False)
 print("✓ Clean data saved to Output/clean_data.csv")
 
-# ================================================
 # STEP 5 - Print the 5 key insights
-# ================================================
+
 print("")
 print("=" * 50)
 print("KEY INSIGHTS")
@@ -106,9 +104,9 @@ print("\n5. Revenue by year:")
 insight5 = df.groupby('order_year')['price'].sum().round(2)
 print(insight5)
 
-# ================================================
+
 # STEP 6 - Create and save 4 charts
-# ================================================
+
 print("\nGenerating charts...")
 fig, axes = plt.subplots(2, 2, figsize=(14, 10))
 fig.suptitle('E-Commerce Sales Analytics - Key Insights', fontsize=16)
